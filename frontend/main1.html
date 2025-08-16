@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>MMU Resource Hub</title>
+  <link rel="stylesheet" href="main1.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <h1>MMU Resource Hub</h1>
+    <img src="mmu-logo.PNG" alt="MMU Logo">
+  </header>
+
+  <div class="container">
+    <!-- Upload Section -->
+    <h2>Upload New Resource</h2>
+    <form id="upload-form" enctype="multipart/form-data">
+      <label for="faculty">Faculty:</label>
+      <select name="faculty" required>
+        <option value="">-- Select Faculty --</option>
+        <option value="Faculty of Computing & Informatics (FCI)">Faculty of Computing & Informatics (FCI)</option>
+        <option value="Faculty of Cinematic Arts (FCA)">Faculty of Cinematic Arts (FCA)</option>
+        <option value="Faculty of Law (FOL)">Faculty of Law (FOL)</option>
+        <option value="Faculty of Engineering & Technology (FET)">Faculty of Engineering & Technology (FET)</option>
+        <option value="Faculty of Artificial Intelligence & Engineering (FAIE)">Faculty of Artificial Intelligence & Engineering (FAIE)</option>
+        <option value="Faculty of Information Science & Technology (FIST)">Faculty of Information Science & Technology (FIST)</option>
+        <option value="Faculty of Management (FOM)">Faculty of Management (FOM)</option>
+        <option value="Faculty of Creative Multimedia (FCM)">Faculty of Creative Multimedia (FCM)</option>
+        <option value="Faculty of Applied Communication (FAC)">Faculty of Applied Communication (FAC)</option>
+        <option value="Faculty of Business (FOB)">Faculty of Business (FOB)</option>
+      </select>
+
+      <label for="level">Level:</label>
+      <select name="level" required>
+        <option value="">-- Select Level --</option>
+        <option value="Degree">Degree</option>
+        <option value="Diploma">Diploma</option>
+        <option value="Foundation">Foundation</option>
+        <option value="Postgraduate">Postgraduate</option>
+      </select>
+
+      <label for="program">Program:</label>
+      <input type="text" name="program" required>
+
+      <label for="subject">Subject:</label>
+      <input type="text" name="subject" required>
+
+      <label for="file">File:</label>
+      <input type="file" name="file" required>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Search Section -->
+    <h2>Search Resources</h2>
+    <form id="search-form">
+      <label for="faculty">Faculty:</label>
+      <select name="faculty">
+        <option value="">-- Any Faculty --</option>
+        <option value="Faculty of Computing & Informatics (FCI)">Faculty of Computing & Informatics (FCI)</option>
+        <option value="Faculty of Cinematic Arts (FCA)">Faculty of Cinematic Arts (FCA)</option>
+        <option value="Faculty of Law (FOL)">Faculty of Law (FOL)</option>
+        <option value="Faculty of Engineering & Technology (FET)">Faculty of Engineering & Technology (FET)</option>
+        <option value="Faculty of Artificial Intelligence & Engineering (FAIE)">Faculty of Artificial Intelligence & Engineering (FAIE)</option>
+        <option value="Faculty of Information Science & Technology (FIST)">Faculty of Information Science & Technology (FIST)</option>
+        <option value="Faculty of Management (FOM)">Faculty of Management (FOM)</option>
+        <option value="Faculty of Creative Multimedia (FCM)">Faculty of Creative Multimedia (FCM)</option>
+        <option value="Faculty of Applied Communication (FAC)">Faculty of Applied Communication (FAC)</option>
+        <option value="Faculty of Business (FOB)">Faculty of Business (FOB)</option>
+      </select>
+
+      <label for="level">Level:</label>
+      <select name="level">
+        <option value="">-- Any Level --</option>
+        <option value="Degree">Degree</option>
+        <option value="Diploma">Diploma</option>
+        <option value="Foundation">Foundation</option>
+        <option value="Postgraduate">Postgraduate</option>
+      </select>
+
+      <label for="program">Program:</label>
+      <input type="text" name="program">
+
+      <label for="subject">Subject:</label>
+      <input type="text" name="subject">
+
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- Results Section -->
+    <h2>Search Results</h2>
+    <table id="results-table">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- JS Script -->
+  <script>
+    const uploadForm = document.getElementById('upload-form');
+    const searchForm = document.getElementById('search-form');
+    const resultsTableHead = document.querySelector('#results-table thead');
+    const resultsTableBody = document.querySelector('#results-table tbody');
+
+    // Handle upload form submission
+    uploadForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(uploadForm);
+
+      try {
+        const res = await fetch('/resources', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          alert('Data added successfully!');
+          uploadForm.reset();
+          searchForm.dispatchEvent(new Event('submit')); // refresh results after upload
+        } else {
+          alert('Upload failed.');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    // Handle search form submission
+    searchForm.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const params = new URLSearchParams();
+      ['faculty', 'level', 'program', 'subject'].forEach(name => {
+        const value = searchForm.elements[name].value.trim();
+        if (value) params.append(name, value);
+      });
+
+      try {
+        const res = await fetch('/resources?' + params.toString());
+        const data = await res.json();
+
+        resultsTableHead.innerHTML = '';
+        resultsTableBody.innerHTML = '';
+
+        if (data.length) {
+          const headers = data[0];
+          const rows = data.slice(1);
+
+          const headerRow = document.createElement('tr');
+          headers.forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            headerRow.appendChild(th);
+          });
+          resultsTableHead.appendChild(headerRow);
+
+          rows.forEach(row => {
+            const tr = document.createElement('tr');
+            row.forEach((cell, idx) => {
+              const td = document.createElement('td');
+              if (idx === row.length - 1 && cell) { // last column file link
+                const a = document.createElement('a');
+                a.href = cell;
+                a.target = '_blank';
+                a.textContent = 'Download';
+                td.appendChild(a);
+              } else {
+                td.textContent = cell;
+              }
+              tr.appendChild(td);
+            });
+            resultsTableBody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        alert('Search failed: ' + err.message);
+      }
+    });
+
+    // Load all data initially
+    searchForm.dispatchEvent(new Event('submit'));
+  </script>
+</body>
+
+</html>
