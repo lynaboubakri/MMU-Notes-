@@ -98,11 +98,15 @@ The project uses **Google Sheets** as a lightweight backend and **file uploads**
 # Contact
 * Developer : Chan Hui Ern
 * Email : CHAN.HUI.ERN@student.mmu.edu.my
+* GitHub Link : https://github.com/huiern88-sketch
 * Developer : Lyna Boubakri
 * Email : BOUBAKRI.LYNA1@student.mmu.edu.my
+* GitHub Link : https://github.com/lynaboubakri
 * Developer : Vinayagam A/L Murugan 
 * Email : VINAYAGAM.MURUGAN@student.mmu.edu.my
+* GitHub Link : https://github.com/vina-bot
 * Developer : Nur Najwa Nabilah Bt Mohd Azrin
 * Email : nur.najwa.nabilah@student.mmu.edu.my
+* GitHub Link : https://github.com/najwazrin
   
 
