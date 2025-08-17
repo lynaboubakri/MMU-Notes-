@@ -1,7 +1,7 @@
 # MMU-Notes
 
 **Project Type:** Web Application  
-**Team Name / Author:** **notTuff.exe**  
+**Team Name :** **notTuff.exe**  
 
 
 ---
